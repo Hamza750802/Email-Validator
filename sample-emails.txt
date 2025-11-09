@@ -1,0 +1,25 @@
+# Sample email addresses for testing ValidR CLI
+# Lines starting with # are comments and will be ignored
+
+# Valid emails
+user@gmail.com
+john.doe@example.com
+contact@microsoft.com
+
+# Invalid syntax
+not-an-email
+invalid@
+@nodomain.com
+
+# Disposable domains
+test@mailinator.com
+spam@guerrillamail.com
+temp@10minutemail.com
+
+# Role accounts
+admin@example.com
+support@company.com
+noreply@service.com
+
+# Domain without MX
+user@nonexistent-domain-xyz123.com

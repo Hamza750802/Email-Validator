@@ -1,0 +1,35 @@
+# Render Blueprint for ValidR Email Validation Service
+# This file enables one-click deployment to Render
+# Learn more: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: validr
+    runtime: docker
+    plan: free  # or 'starter' for $7/month (no cold starts)
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: SMTP_MAX_GLOBAL_CONCURRENCY
+        value: 10
+      - key: SMTP_MAX_MX_CONCURRENCY
+        value: 2
+      - key: SMTP_PER_DOMAIN_MIN_INTERVAL_MS
+        value: 2000
+      - key: SMTP_SOFT_RETRY_LIMIT
+        value: 2
+      - key: SMTP_INITIAL_RETRY_DELAY_MS
+        value: 5000
+      - key: SMTP_RETRY_BACKOFF_FACTOR
+        value: 3
+      - key: SMTP_CONNECT_TIMEOUT_MS
+        value: 10000
+      - key: SMTP_OVERALL_TIMEOUT_MS
+        value: 15000
+      - key: SMTP_HELO_DOMAIN
+        value: mail.yourdomain.com  # ⚠️ CHANGE THIS to your real domain
+      - key: SMTP_MAIL_FROM
+        value: verifier@yourdomain.com  # ⚠️ CHANGE THIS to your real email
