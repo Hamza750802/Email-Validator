@@ -34,6 +34,12 @@ RUN npm ci --only=production
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy data files (disposable domains, etc.)
+COPY --from=builder /app/data ./data
+
+# Copy public assets (landing page)
+COPY --from=builder /app/public ./public
+
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
