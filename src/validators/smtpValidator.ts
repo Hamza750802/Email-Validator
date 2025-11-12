@@ -20,6 +20,7 @@ import { validateMx } from './dnsValidator';
 import { throttleState } from '../utils/throttleState';
 import { logger } from '../utils/logger';
 import { config } from '../config/env';
+import { enhanceWithProviderHints, detectProvider } from './providers';
 
 /**
  * SMTP validation configuration
@@ -342,7 +343,7 @@ async function validateSmtpSingle(
     });
     
     // Map error to result
-    return mapErrorToResult(error);
+    return mapErrorToResult(error, mxHost);
     
   } finally {
     // Always release slot and close socket
@@ -523,7 +524,7 @@ async function performSmtpHandshake(
           const quit = 'QUIT\r\n';
           socket.write(quit);
           
-          const result = interpretSmtpCode(code, line, rawResponse);
+          const result = interpretSmtpCode(code, line, rawResponse, mxHost);
           return resolve(result);
         }
       }
@@ -564,12 +565,13 @@ function extractSmtpCode(response: string): number {
 }
 
 /**
- * Interpret SMTP status code and message
+ * Interpret SMTP status code and message with provider-specific heuristics
  */
 function interpretSmtpCode(
   code: number,
   message: string,
-  rawResponse: string
+  rawResponse: string,
+  mxHost: string  // Added parameter for provider detection
 ): SmtpValidationResult {
   const lowerMessage = message.toLowerCase();
   
@@ -586,10 +588,27 @@ function interpretSmtpCode(
       };
     }
     
+    // Use provider heuristics to enhance confidence
+    const enhanced = enhanceWithProviderHints('valid', mxHost, rawResponse);
+    const provider = detectProvider(mxHost);
+    
+    // If provider hint suggests it's inconclusive (e.g., ProtonMail/Yahoo catch-all)
+    if (enhanced.status === 'inconclusive') {
+      logger.info(`Provider ${provider} may use catch-all behavior, marking as catch_all`, {
+        confidence: enhanced.confidence,
+        reason: enhanced.providerHint.reason
+      });
+      return {
+        smtpStatus: 'catch_all',
+        reasonCodes: ['smtp_catch_all', 'smtp_valid'],
+        rawSmtpResponse: `${rawResponse} (Provider: ${provider}, ${enhanced.providerHint.reason})`,
+      };
+    }
+    
     return {
       smtpStatus: 'valid',
       reasonCodes: ['smtp_valid'],
-      rawSmtpResponse: rawResponse,
+      rawSmtpResponse: `${rawResponse} (Provider: ${provider}, Confidence: ${enhanced.confidence})`,
     };
   }
   
@@ -622,6 +641,46 @@ function interpretSmtpCode(
   
   // 5xx - Permanent failure (hard bounce)
   if (code >= 500 && code < 600) {
+    // Use provider heuristics for more accurate interpretation
+    const enhanced = enhanceWithProviderHints('invalid', mxHost, rawResponse);
+    const provider = detectProvider(mxHost);
+    
+    // High confidence invalid (e.g., Gmail "550-5.1.1 user does not exist")
+    if (enhanced.confidence === 'high') {
+      logger.info(`High-confidence invalid from ${provider}`, {
+        reason: enhanced.providerHint.reason
+      });
+      return {
+        smtpStatus: 'invalid',
+        reasonCodes: ['smtp_invalid', 'smtp_user_unknown'],
+        rawSmtpResponse: `${rawResponse} (Provider: ${provider}, ${enhanced.providerHint.reason})`,
+      };
+    }
+    
+    // Medium confidence - might be sender reputation issue
+    if (enhanced.confidence === 'medium') {
+      logger.info(`Medium-confidence rejection from ${provider}, could be sender issue`, {
+        reason: enhanced.providerHint.reason
+      });
+      return {
+        smtpStatus: 'invalid',
+        reasonCodes: ['smtp_invalid'],
+        rawSmtpResponse: `${rawResponse} (Provider: ${provider}, ${enhanced.providerHint.reason})`,
+      };
+    }
+    
+    // Low confidence - likely sender reputation, not invalid recipient
+    if (enhanced.confidence === 'low') {
+      logger.warn(`Low-confidence rejection from ${provider}, likely sender reputation issue`, {
+        reason: enhanced.providerHint.reason
+      });
+      return {
+        smtpStatus: 'temporarily_unavailable',  // Treat as temporary
+        reasonCodes: ['smtp_temporarily_unavailable', 'smtp_sender_blocked'],
+        rawSmtpResponse: `${rawResponse} (Provider: ${provider}, ${enhanced.providerHint.reason})`,
+      };
+    }
+    
     return {
       smtpStatus: 'invalid',
       reasonCodes: ['smtp_invalid'],
@@ -661,12 +720,12 @@ function isHardBlockError(error: any): boolean {
 /**
  * Map connection error to SMTP result
  */
-function mapErrorToResult(error: any): SmtpValidationResult {
+function mapErrorToResult(error: any, mxHost: string = 'unknown'): SmtpValidationResult {
   const message = error.message || '';
   const code = extractSmtpCode(message);
   
   if (code > 0) {
-    return interpretSmtpCode(code, message, message);
+    return interpretSmtpCode(code, message, message, mxHost);
   }
   
   // Enhanced error taxonomy for better analytics

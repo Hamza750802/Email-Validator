@@ -55,6 +55,8 @@ export type ValidationReasonCode =
   | "smtp_rate_limited"
   | "smtp_soft_fails_exceeded"
   | "smtp_hard_block"
+  | "smtp_user_unknown"              // Definitive: user does not exist
+  | "smtp_sender_blocked"            // Sender reputation issue
   
   // Enhanced SMTP error taxonomy
   | "smtp_conn_refused"              // ECONNREFUSED - port closed/filtered
