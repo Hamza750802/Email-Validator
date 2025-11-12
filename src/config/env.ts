@@ -12,6 +12,7 @@
 import dotenv from 'dotenv';
 import { join } from 'path';
 import { SubscriptionTier } from '../types/context';
+import { logger } from '../utils/logger';
 
 // Load .env file from root directory
 dotenv.config({ path: join(__dirname, '../../.env') });
@@ -42,6 +43,20 @@ interface Config {
     overallTimeoutMs: number;           // Total operation timeout
     heloDomain: string;                 // Domain to use in HELO/EHLO
     mailFrom: string;                   // Email address for MAIL FROM
+    
+    // Per-phase timeouts for granular control
+    bannerTimeoutMs: number;            // Timeout waiting for SMTP banner
+    ehloTimeoutMs: number;              // Timeout for EHLO response
+    mailTimeoutMs: number;              // Timeout for MAIL FROM response
+    rcptTimeoutMs: number;              // Timeout for RCPT TO response
+    
+    // STARTTLS support
+    requireTls: boolean;                // Require TLS upgrade (reject non-TLS)
+    allowTlsDowngrade: boolean;         // Allow fallback to plaintext if TLS fails
+    
+    // MX probing strategy
+    maxMxAttempts: number;              // Max MX hosts to try before giving up
+    randomizeSamePriority: boolean;     // Randomize MX order within same priority
   };
 }
 
@@ -203,6 +218,20 @@ export const config: Config = {
     overallTimeoutMs: getEnvInt('SMTP_OVERALL_TIMEOUT_MS', 15000, { min: 5000, max: 120000 }),
     heloDomain: getEnvString('SMTP_HELO_DOMAIN', 'mail.localtest.candlebrain.app'),
     mailFrom: getEnvString('SMTP_MAIL_FROM', 'verifier@candlebrain.app'),
+    
+    // Per-phase timeouts for granular failure detection
+    bannerTimeoutMs: getEnvInt('SMTP_BANNER_TIMEOUT_MS', 5000, { min: 1000, max: 30000 }),
+    ehloTimeoutMs: getEnvInt('SMTP_EHLO_TIMEOUT_MS', 5000, { min: 1000, max: 30000 }),
+    mailTimeoutMs: getEnvInt('SMTP_MAIL_TIMEOUT_MS', 5000, { min: 1000, max: 30000 }),
+    rcptTimeoutMs: getEnvInt('SMTP_RCPT_TIMEOUT_MS', 5000, { min: 1000, max: 30000 }),
+    
+    // STARTTLS support
+    requireTls: getEnvString('SMTP_REQUIRE_TLS', 'false') === 'true',
+    allowTlsDowngrade: getEnvString('SMTP_ALLOW_TLS_DOWNGRADE', 'true') === 'true',
+    
+    // MX probing strategy
+    maxMxAttempts: getEnvInt('SMTP_MAX_MX_ATTEMPTS', 5, { min: 1, max: 10 }),
+    randomizeSamePriority: getEnvString('SMTP_RANDOMIZE_SAME_PRIORITY', 'true') === 'true',
   },
 };
 
@@ -229,6 +258,41 @@ export function validateConfig(): void {
       `SMTP_OVERALL_TIMEOUT_MS (${config.smtp.overallTimeoutMs}) must be greater than ` +
       `SMTP_CONNECT_TIMEOUT_MS (${config.smtp.connectTimeoutMs})`
     );
+  }
+
+  // Validate per-phase timeouts are reasonable
+  const phaseTimeouts = [
+    { name: 'SMTP_BANNER_TIMEOUT_MS', value: config.smtp.bannerTimeoutMs },
+    { name: 'SMTP_EHLO_TIMEOUT_MS', value: config.smtp.ehloTimeoutMs },
+    { name: 'SMTP_MAIL_TIMEOUT_MS', value: config.smtp.mailTimeoutMs },
+    { name: 'SMTP_RCPT_TIMEOUT_MS', value: config.smtp.rcptTimeoutMs },
+  ];
+
+  for (const { name, value } of phaseTimeouts) {
+    if (value <= 0) {
+      errors.push(`${name} must be > 0 (got: ${value})`);
+    }
+    if (value >= config.smtp.overallTimeoutMs) {
+      errors.push(
+        `${name} (${value}ms) must be < SMTP_OVERALL_TIMEOUT_MS (${config.smtp.overallTimeoutMs}ms)`
+      );
+    }
+  }
+
+  // Warn if sum of phase timeouts exceeds overall timeout
+  const sumPhaseTimeouts = phaseTimeouts.reduce((sum, { value }) => sum + value, 0);
+  if (sumPhaseTimeouts > config.smtp.overallTimeoutMs) {
+    logger.warn(
+      `⚠️  Sum of phase timeouts (${sumPhaseTimeouts}ms) exceeds SMTP_OVERALL_TIMEOUT_MS ` +
+      `(${config.smtp.overallTimeoutMs}ms). Overall timeout will take precedence.`
+    );
+  }
+
+  // Validate TLS config logic
+  if (config.smtp.requireTls && !config.smtp.allowTlsDowngrade) {
+    logger.info('✅ Strict TLS mode enabled: will reject servers without STARTTLS');
+  } else if (config.smtp.requireTls && config.smtp.allowTlsDowngrade) {
+    logger.warn('⚠️  SMTP_REQUIRE_TLS=true but SMTP_ALLOW_TLS_DOWNGRADE=true. TLS failures will downgrade to plaintext.');
   }
 
   if (errors.length > 0) {

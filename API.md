@@ -176,22 +176,68 @@ The API returns a score from 0.0 to 1.0 for each email:
 
 ## Reason Codes
 
-Each validation includes detailed reason codes:
+Each validation includes detailed reason codes for transparency and debugging:
 
-**Syntax:**
-- `syntax_valid`, `syntax_invalid`
+### Syntax Validation
+- `syntax_valid` - Email format is valid per RFC 5321/5322
+- `syntax_invalid` - Email format is invalid
+- `syntax_invalid_format`, `syntax_invalid_characters`, `syntax_missing_at_sign`, `syntax_multiple_at_signs`, `syntax_empty_local_part`, `syntax_empty_domain`
 
-**DNS/MX:**
-- `mx_records_found`, `no_mx_records`, `dns_lookup_failed`
+### DNS/MX Validation
+- `mx_records_found` - Domain has valid MX records
+- `no_mx_records` - Domain has no MX records
+- `dns_lookup_failed` - DNS query failed
+- `dns_timeout` - DNS query timed out
 
-**Disposable:**
-- `disposable_domain`, `non_disposable_domain`
+### Disposable Domain Detection
+- `disposable_domain` - Known temporary email provider
+- `non_disposable_domain` - Not a disposable domain
 
-**Role:**
-- `role_account`, `non_role_account`
+### Role Account Detection
+- `role_account` - Common role-based address (admin@, info@, etc.)
+- `non_role_account` - Not a role account
 
-**SMTP:**
-- `smtp_valid`, `smtp_invalid`, `smtp_catch_all`, `smtp_temporarily_unavailable`, `smtp_timeout`, etc.
+### SMTP Validation
+
+**Success/Failure:**
+- `smtp_valid` - Mailbox verified via SMTP
+- `smtp_invalid` - Mailbox rejected by SMTP server
+- `smtp_catch_all` - Domain accepts all addresses (catch-all server)
+- `smtp_temporarily_unavailable` - Temporary failure (greylisting)
+
+**Connection Errors (NEW - Granular Diagnostics):**
+- `smtp_conn_refused` - Connection refused (port 25 blocked/filtered)
+- `smtp_network_unreachable` - Network/host unreachable (routing issue)
+- `smtp_conn_reset` - Connection reset by peer (possibly IP-blocked)
+
+**Phase-Specific Timeouts (NEW - Identifies WHERE it fails):**
+- `smtp_banner_timeout` - Timeout waiting for 220 greeting (slow/tarpit server)
+- `smtp_ehlo_timeout` - Timeout during EHLO handshake
+- `smtp_mail_timeout` - Timeout during MAIL FROM command
+- `smtp_rcpt_timeout` - Timeout during RCPT TO command (greylisting common here)
+
+**Protocol Issues:**
+- `smtp_tls_required` - Server requires STARTTLS (530 response)
+- `smtp_tls_handshake_failed` - TLS upgrade failed (future implementation)
+- `smtp_mx_all_failed` - All MX hosts failed/unreachable
+
+**Rate Limiting & Retries:**
+- `smtp_timeout` - Generic timeout (use phase-specific codes above for details)
+- `smtp_connection_failed` - Generic connection error
+- `smtp_greylisted` - Server greylisting detected (4xx codes)
+- `smtp_rate_limited` - Rate limit detected
+- `smtp_soft_fails_exceeded` - Max retries exceeded on soft failures
+
+### Caching
+- `cache_hit` - Result retrieved from cache
+- `cache_miss` - Fresh validation performed
+
+---
+
+**💡 Tip:** Check `reasonCodes` array for detailed failure diagnostics. For example:
+- `["smtp_banner_timeout"]` → Increase `SMTP_BANNER_TIMEOUT_MS`
+- `["smtp_conn_refused"]` → Port 25 blocked, deploy to cloud with SMTP access
+- `["smtp_rcpt_timeout", "smtp_greylisted"]` → Server greylisting, retry recommended
 
 ## Example Usage
 

@@ -56,6 +56,18 @@ export type ValidationReasonCode =
   | "smtp_soft_fails_exceeded"
   | "smtp_hard_block"
   
+  // Enhanced SMTP error taxonomy
+  | "smtp_conn_refused"              // ECONNREFUSED - port closed/filtered
+  | "smtp_network_unreachable"       // ENETUNREACH/EHOSTUNREACH - routing issue
+  | "smtp_conn_reset"                // ECONNRESET - connection dropped
+  | "smtp_banner_timeout"            // Timeout waiting for banner
+  | "smtp_ehlo_timeout"              // Timeout during EHLO handshake
+  | "smtp_mail_timeout"              // Timeout during MAIL FROM
+  | "smtp_rcpt_timeout"              // Timeout during RCPT TO
+  | "smtp_tls_required"              // Server requires STARTTLS (530)
+  | "smtp_tls_handshake_failed"      // TLS upgrade failed
+  | "smtp_mx_all_failed"             // All MX hosts failed/unreachable
+  
   // Caching
   | "cache_hit"
   | "cache_miss";
@@ -87,6 +99,12 @@ export interface EmailValidationResult {
   
   /** Result of SMTP handshake verification */
   smtpStatus: SmtpStatus;
+  
+  /** Whether the domain is a catch-all server (accepts any email) */
+  catchAll?: boolean;
+  
+  /** Whether the email was greylisted during validation */
+  greylisted?: boolean;
   
   /** Overall validation score from 0.0 (invalid) to 1.0 (highly valid) */
   score: number;

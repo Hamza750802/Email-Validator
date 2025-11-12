@@ -175,6 +175,8 @@ export async function validateEmail(
     disposable: disposableResult.disposable,
     roleAccount: roleResult.roleAccount,
     smtpStatus,
+    catchAll: smtpStatus === 'catch_all' || allReasonCodes.includes('smtp_catch_all') ? true : undefined,
+    greylisted: allReasonCodes.includes('smtp_greylisted') ? true : undefined,
     rawSmtpResponse,
     score,
     reasonCodes: allReasonCodes,
