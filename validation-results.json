@@ -1,0 +1,263 @@
+[
+  {
+    "email": "user@gmail.com",
+    "localPart": "user",
+    "domain": "gmail.com",
+    "syntaxValid": true,
+    "domainHasMx": true,
+    "disposable": false,
+    "roleAccount": false,
+    "smtpStatus": "not_checked",
+    "score": 0.95,
+    "reasonCodes": [
+      "syntax_valid",
+      "cache_miss",
+      "mx_records_found",
+      "domain_valid",
+      "non_disposable_domain",
+      "non_role_account"
+    ],
+    "validatedAt": "2025-11-09T07:31:07.776Z",
+    "validationTimeMs": 50
+  },
+  {
+    "email": "john.doe@example.com",
+    "localPart": "john.doe",
+    "domain": "example.com",
+    "syntaxValid": true,
+    "domainHasMx": true,
+    "disposable": false,
+    "roleAccount": false,
+    "smtpStatus": "not_checked",
+    "score": 0.95,
+    "reasonCodes": [
+      "syntax_valid",
+      "cache_miss",
+      "mx_records_found",
+      "domain_valid",
+      "non_disposable_domain",
+      "non_role_account"
+    ],
+    "validatedAt": "2025-11-09T07:31:07.839Z",
+    "validationTimeMs": 62
+  },
+  {
+    "email": "contact@microsoft.com",
+    "localPart": "contact",
+    "domain": "microsoft.com",
+    "syntaxValid": true,
+    "domainHasMx": true,
+    "disposable": false,
+    "roleAccount": true,
+    "smtpStatus": "not_checked",
+    "score": 0.87,
+    "reasonCodes": [
+      "syntax_valid",
+      "cache_miss",
+      "mx_records_found",
+      "domain_valid",
+      "non_disposable_domain",
+      "role_account"
+    ],
+    "validatedAt": "2025-11-09T07:31:07.900Z",
+    "validationTimeMs": 61
+  },
+  {
+    "email": "not-an-email",
+    "localPart": "not-an-email",
+    "domain": "",
+    "syntaxValid": false,
+    "domainHasMx": false,
+    "disposable": false,
+    "roleAccount": false,
+    "smtpStatus": "not_checked",
+    "score": 0,
+    "reasonCodes": [
+      "syntax_invalid",
+      "syntax_missing_at_sign"
+    ],
+    "validatedAt": "2025-11-09T07:31:07.901Z",
+    "validationTimeMs": 0
+  },
+  {
+    "email": "invalid@",
+    "localPart": "invalid",
+    "domain": "",
+    "syntaxValid": false,
+    "domainHasMx": false,
+    "disposable": false,
+    "roleAccount": false,
+    "smtpStatus": "not_checked",
+    "score": 0,
+    "reasonCodes": [
+      "syntax_invalid",
+      "syntax_empty_domain"
+    ],
+    "validatedAt": "2025-11-09T07:31:07.903Z",
+    "validationTimeMs": 1
+  },
+  {
+    "email": "@nodomain.com",
+    "localPart": "",
+    "domain": "nodomain.com",
+    "syntaxValid": false,
+    "domainHasMx": false,
+    "disposable": false,
+    "roleAccount": false,
+    "smtpStatus": "not_checked",
+    "score": 0,
+    "reasonCodes": [
+      "syntax_invalid",
+      "syntax_empty_local_part"
+    ],
+    "validatedAt": "2025-11-09T07:31:07.904Z",
+    "validationTimeMs": 1
+  },
+  {
+    "email": "test@mailinator.com",
+    "localPart": "test",
+    "domain": "mailinator.com",
+    "syntaxValid": true,
+    "domainHasMx": true,
+    "disposable": true,
+    "roleAccount": false,
+    "smtpStatus": "not_checked",
+    "score": 0.7,
+    "reasonCodes": [
+      "syntax_valid",
+      "cache_miss",
+      "mx_records_found",
+      "domain_valid",
+      "disposable_domain",
+      "non_role_account"
+    ],
+    "validatedAt": "2025-11-09T07:31:08.047Z",
+    "validationTimeMs": 143
+  },
+  {
+    "email": "spam@guerrillamail.com",
+    "localPart": "spam",
+    "domain": "guerrillamail.com",
+    "syntaxValid": true,
+    "domainHasMx": true,
+    "disposable": true,
+    "roleAccount": false,
+    "smtpStatus": "not_checked",
+    "score": 0.7,
+    "reasonCodes": [
+      "syntax_valid",
+      "cache_miss",
+      "mx_records_found",
+      "domain_valid",
+      "disposable_domain",
+      "non_role_account"
+    ],
+    "validatedAt": "2025-11-09T07:31:08.301Z",
+    "validationTimeMs": 253
+  },
+  {
+    "email": "temp@10minutemail.com",
+    "localPart": "temp",
+    "domain": "10minutemail.com",
+    "syntaxValid": true,
+    "domainHasMx": false,
+    "disposable": true,
+    "roleAccount": false,
+    "smtpStatus": "not_checked",
+    "score": 0.1,
+    "reasonCodes": [
+      "syntax_valid",
+      "cache_miss",
+      "no_mx_records",
+      "domain_invalid",
+      "disposable_domain",
+      "non_role_account"
+    ],
+    "validatedAt": "2025-11-09T07:31:08.455Z",
+    "validationTimeMs": 152
+  },
+  {
+    "email": "admin@example.com",
+    "localPart": "admin",
+    "domain": "example.com",
+    "syntaxValid": true,
+    "domainHasMx": true,
+    "disposable": false,
+    "roleAccount": true,
+    "smtpStatus": "not_checked",
+    "score": 0.87,
+    "reasonCodes": [
+      "syntax_valid",
+      "cache_hit",
+      "mx_records_found",
+      "domain_valid",
+      "non_disposable_domain",
+      "role_account"
+    ],
+    "validatedAt": "2025-11-09T07:31:08.462Z",
+    "validationTimeMs": 5
+  },
+  {
+    "email": "support@company.com",
+    "localPart": "support",
+    "domain": "company.com",
+    "syntaxValid": true,
+    "domainHasMx": false,
+    "disposable": false,
+    "roleAccount": true,
+    "smtpStatus": "not_checked",
+    "score": 0.1,
+    "reasonCodes": [
+      "syntax_valid",
+      "cache_miss",
+      "no_mx_records",
+      "domain_invalid",
+      "non_disposable_domain",
+      "role_account"
+    ],
+    "validatedAt": "2025-11-09T07:31:08.527Z",
+    "validationTimeMs": 64
+  },
+  {
+    "email": "noreply@service.com",
+    "localPart": "noreply",
+    "domain": "service.com",
+    "syntaxValid": true,
+    "domainHasMx": false,
+    "disposable": false,
+    "roleAccount": true,
+    "smtpStatus": "not_checked",
+    "score": 0.1,
+    "reasonCodes": [
+      "syntax_valid",
+      "cache_miss",
+      "no_mx_records",
+      "domain_invalid",
+      "non_disposable_domain",
+      "role_account"
+    ],
+    "validatedAt": "2025-11-09T07:31:08.693Z",
+    "validationTimeMs": 164
+  },
+  {
+    "email": "user@nonexistent-domain-xyz123.com",
+    "localPart": "user",
+    "domain": "nonexistent-domain-xyz123.com",
+    "syntaxValid": true,
+    "domainHasMx": false,
+    "disposable": false,
+    "roleAccount": false,
+    "smtpStatus": "not_checked",
+    "score": 0.1,
+    "reasonCodes": [
+      "syntax_valid",
+      "cache_miss",
+      "no_mx_records",
+      "domain_invalid",
+      "non_disposable_domain",
+      "non_role_account"
+    ],
+    "validatedAt": "2025-11-09T07:31:08.857Z",
+    "validationTimeMs": 162
+  }
+]

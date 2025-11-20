@@ -1,0 +1,54 @@
+{
+  "name": "email-validator-service",
+  "version": "1.0.0",
+  "description": "ValidR - Polite email validation service with SMTP handshake probing",
+  "main": "dist/http/server.js",
+  "scripts": {
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/http/server.ts",
+    "build": "tsc",
+    "start": "node dist/http/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src --ext .ts",
+    "validate-file": "ts-node src/cli/validateFile.ts"
+  },
+  "keywords": [
+    "email",
+    "validation",
+    "smtp",
+    "dns",
+    "validator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.2.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "ioredis": "^5.8.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^6.9.7",
+    "validator": "^13.11.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.11",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^20.10.5",
+    "@types/nodemailer": "^6.4.14",
+    "@types/supertest": "^6.0.3",
+    "@types/validator": "^13.11.7",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

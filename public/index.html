@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ValidR - Professional Email Validation API</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #dc2626; /* Red */
+            --primary-dark: #991b1b;
+            --secondary: #ef4444; /* Bright Red */
+            --accent: #f87171; /* Light Red */
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --bg-dark: #0a0a0a;
+            --bg-darker: #000000;
+            --text-light: #f1f5f9;
+            --text-gray: #94a3b8;
+            --border: #1e1e1e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a0000 50%, #0a0a0a 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Animated background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(220,38,38,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(220,38,38,0.15) 0%, transparent 50%);
+            z-index: 0;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 10px 30px rgba(220,38,38,0.4);
+            border: 2px solid rgba(220,38,38,0.3);
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 16px;
+            text-shadow: 2px 4px 8px rgba(220,38,38,0.5);
+            letter-spacing: -0.02em;
+        }
+
+        .hero .tagline {
+            font-size: 1.4em;
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .hero .subtitle {
+            font-size: 1.1em;
+            color: rgba(255,255,255,0.75);
+            max-width: 700px;
+            margin: 0 auto 30px;
+            font-weight: 300;
+        }
+
+        .hero .subtitle {
+            font-size: 1.1em;
+            color: rgba(255,255,255,0.85);
+            max-width: 700px;
+            margin: 0 auto 30px;
+            font-weight: 300;
+        }
+
+        .stats-banner {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stats-banner .stat {
+            text-align: center;
+            color: white;
+        }
+
+        .stats-banner .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stats-banner .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* Main Card */
+        .card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(220,38,38,0.2);
+        }
+
+        .upload-section {
+            text-align: center;
+        }
+
+        .upload-section h2 {
+            color: var(--text-light);
+            font-size: 2em;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .upload-section .description {
+            color: var(--text-gray);
+            margin-bottom: 32px;
+            font-size: 1.05em;
+        }
+
+        /* File Upload Area */
+        .file-drop-zone {
+            border: 3px dashed rgba(220,38,38,0.3);
+            border-radius: 16px;
+            padding: 48px 24px;
+            margin: 24px 0;
+            background: rgba(26,26,26,0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .file-drop-zone:hover {
+            border-color: var(--primary);
+            background: rgba(220,38,38,0.1);
+            transform: translateY(-2px);
+        }
+
+        .file-drop-zone.dragging {
+            border-color: var(--primary);
+            background: rgba(220,38,38,0.15);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(220,38,38,0.4);
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220,38,38,0.5);
+        }
+
+        .file-name {
+            display: block;
+            margin-top: 16px;
+            color: var(--text-gray);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .file-selected {
+            background: rgba(26,26,26,0.8);
+            border: 2px solid var(--primary);
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .file-selected.active {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-icon-lg {
+            font-size: 2em;
+        }
+
+        .remove-file {
+            background: #fee2e2;
+            color: var(--error);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+
+        .remove-file:hover {
+            background: var(--error);
+            color: white;
+        }
+
+        /* Options */
+        .options {
+            margin: 24px 0;
+            padding: 20px;
+            background: var(--bg-light);
+            border-radius: 12px;
+        }
+
+        .option-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .option-item:hover {
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .option-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .option-item label {
+            color: var(--text-light);
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Validate Button */
+        .validate-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 48px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(220,38,38,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .validate-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(220,38,38,0.7);
+        }
+
+        .validate-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .validate-btn:disabled {
+            background: #3a3a3a;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Progress */
+        .progress {
+            display: none;
+            margin-top: 32px;
+        }
+
+        .progress.active {
+            display: block;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: #2a2a2a;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 12px;
+            color: var(--text-gray);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .progress-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(220,38,38,0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Results */
+        .results {
+            display: none;
+            margin-top: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .results-header h3 {
+            color: var(--text-light);
+            font-size: 2em;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .results-header .success-icon {
+            font-size: 4em;
+            margin-bottom: 16px;
+            display: block;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a0505 100%);
+            padding: 24px;
+            border: 1px solid rgba(220,38,38,0.2);
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(220,38,38,0.3);
+        }
+
+        .stat-value {
+            font-size: 3em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-value.success { 
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-value.error { 
+            background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-value.warning { 
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-value.accent { 
+            background: linear-gradient(135deg, var(--accent) 0%, #db2777 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.95em;
+            color: var(--text-gray);
+            margin-top: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .download-section {
+            text-align: center;
+            padding: 32px;
+            background: var(--bg-light);
+            border-radius: 16px;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(220,38,38,0.4);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220,38,38,0.5);
+        }
+
+        /* Error Message */
+        .error {
+            background: rgba(220,38,38,0.2);
+            color: #fca5a5;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 24px;
+            display: none;
+            border-left: 4px solid var(--error);
+            font-weight: 500;
+        }
+
+        .error.active {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Features Section */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            padding: 32px;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(220,38,38,0.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 30px rgba(220,38,38,0.3);
+        }
+
+        .feature-icon {
+            font-size: 3.5em;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            color: var(--text-light);
+            margin-bottom: 12px;
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: var(--text-gray);
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .feature-card .feature-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* API Section */
+        .api-section {
+            background: linear-gradient(135deg, #1a0000 0%, #0a0a0a 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-top: 30px;
+            border: 1px solid rgba(220,38,38,0.3);
+        }
+
+        .api-section h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .code-block {
+            background: #0a0a0a;
+            border: 1px solid rgba(220,38,38,0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 16px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block pre {
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .code-block .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(220,38,38,0.2);
+            color: white;
+            border: 1px solid rgba(220,38,38,0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .code-block .copy-btn:hover {
+            background: rgba(220,38,38,0.4);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            padding: 40px 20px;
+            opacity: 0.9;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .footer-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .hero .tagline {
+                font-size: 1.2em;
+            }
+
+            .card {
+                padding: 32px 24px;
+            }
+
+            .stats-banner {
+                gap: 24px;
+            }
+
+            .stats-banner .stat-number {
+                font-size: 2em;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>ValidR</h1>
+            <p class="tagline">Professional Email Validation API</p>
+            <p class="subtitle">
+                Validate email addresses with our powerful 5-layer validation engine. 
+                Syntax, DNS, Disposable Detection, Role Accounts, and SMTP verification.
+            </p>
+            <div class="stats-banner">
+                <div class="stat">
+                    <span class="stat-number">85-90%</span>
+                    <span class="stat-label">Accuracy</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">~30-60s</span>
+                    <span class="stat-label">1000 Emails</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">1000</span>
+                    <span class="stat-label">Max Batch Size</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="card">
+            <h2 style="text-align: center; margin-bottom: 32px; font-size: 2em; font-weight: 700; color: var(--text-light);">
+                Why Choose ValidR?
+            </h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🎯</span>
+                    <h3>5-Layer Validation</h3>
+                    <p>
+                        Comprehensive validation through syntax checking, DNS lookup, disposable detection, 
+                        role account filtering, and SMTP verification.
+                    </p>
+                    <span class="feature-badge">Most Accurate</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <h3>Lightning Fast</h3>
+                    <p>
+                        Smart caching and batch processing ensure rapid validation. 
+                        Process up to 1000 emails per request with sub-second per-email speed.
+                    </p>
+                    <span class="feature-badge">High Performance</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🛡️</span>
+                    <h3>SMTP Safe</h3>
+                    <p>
+                        Polite throttling and adaptive retry logic prevent IP blacklisting. 
+                        Per-domain rate limiting respects mail server policies.
+                    </p>
+                    <span class="feature-badge">Enterprise Ready</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📊</span>
+                    <h3>Detailed Results</h3>
+                    <p>
+                        Get comprehensive validation scores, disposable/role flags, 
+                        and actionable insights for each email address.
+                    </p>
+                    <span class="feature-badge">Full Transparency</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🔒</span>
+                    <h3>Privacy First</h3>
+                    <p>
+                        No PII logging. Email addresses are hashed in logs. 
+                        Your data is processed securely and never stored permanently.
+                    </p>
+                    <span class="feature-badge">GDPR Compliant</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🌐</span>
+                    <h3>Scalable API</h3>
+                    <p>
+                        Built for production with Redis-backed distributed caching and throttling. 
+                        Horizontal scaling ready for millions of validations.
+                    </p>
+                    <span class="feature-badge">Production Grade</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Upload Card -->
+        <div class="card">
+            <div class="upload-section">
+                <h2>🚀 Validate Your Emails</h2>
+                <p class="description">
+                    Upload a CSV file containing email addresses. We'll validate each one and return detailed results.
+                </p>
+
+                <div class="file-drop-zone" id="dropZone">
+                    <span class="upload-icon">📁</span>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="csvFile" accept=".csv" />
+                        <label for="csvFile" class="file-input-label">
+                            <span>�</span>
+                            <span>Choose CSV File</span>
+                        </label>
+                    </div>
+                    <p class="file-name" id="fileName">or drag and drop your file here</p>
+                </div>
+
+                <div class="file-selected" id="fileSelected">
+                    <div class="file-info">
+                        <span class="file-icon-lg">📄</span>
+                        <div>
+                            <strong id="selectedFileName">file.csv</strong>
+                            <div style="font-size: 0.9em; color: var(--text-gray);" id="selectedFileSize">0 KB</div>
+                        </div>
+                    </div>
+                    <button class="remove-file" id="removeFile">✕</button>
+                </div>
+
+                <div class="options">
+                    <div class="option-item">
+                        <input type="checkbox" id="skipSmtp" />
+                        <label for="skipSmtp">⚡ Skip SMTP validation (faster, less accurate)</label>
+                    </div>
+                </div>
+
+                <button class="validate-btn" id="validateBtn" disabled>
+                    <span>�</span>
+                    <span>Validate Emails</span>
+                </button>
+
+                <div class="progress" id="progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">
+                        <span class="progress-spinner"></span>
+                        Processing your emails...
+                    </p>
+                </div>
+
+                <div class="error" id="error"></div>
+            </div>
+
+            <div class="results" id="results">
+                <div class="results-header">
+                    <span class="success-icon">✅</span>
+                    <h3>Validation Complete!</h3>
+                </div>
+                
+                <div class="stats-grid" id="statsGrid"></div>
+
+                <div class="download-section">
+                    <p style="color: var(--text-gray); margin-bottom: 16px; font-size: 1.05em;">
+                        Your validated results are ready to download
+                    </p>
+                    <a class="download-btn" id="downloadBtn" download="validated_emails.csv">
+                        <span>⬇️</span>
+                        <span>Download Results CSV</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Documentation Section -->
+        <div class="api-section">
+            <h2>📚 API Documentation</h2>
+            <p style="margin-bottom: 24px; opacity: 0.9;">
+                Integrate ValidR into your application with our simple REST API
+            </p>
+
+            <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 1.3em;">Single Email Validation</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this, 'code1')">Copy</button>
+                <pre id="code1">POST /validate
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "skipSmtp": false
+}</pre>
+            </div>
+
+            <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 1.3em;">Batch Validation</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this, 'code2')">Copy</button>
+                <pre id="code2">POST /validate-batch
+Content-Type: application/json
+
+{
+  "emails": ["user1@example.com", "user2@example.com"],
+  "skipSmtp": false
+}</pre>
+            </div>
+
+            <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 1.3em;">CSV Upload</h3>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this, 'code3')">Copy</button>
+                <pre id="code3">POST /upload-csv
+Content-Type: multipart/form-data
+
+csv: <file>
+skipSmtp: false
+format: json  // or 'csv' for CSV response</pre>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-links">
+                <a href="/health">API Status</a>
+                <a href="#docs">Documentation</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#support">Support</a>
+            </div>
+            <p style="margin-top: 16px;">
+                ValidR Email Validation Service | Built with ❤️ for developers
+            </p>
+            <p style="font-size: 0.9em; opacity: 0.7; margin-top: 8px;">
+                © 2025 ValidR. All rights reserved.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('csvFile');
+        const dropZone = document.getElementById('dropZone');
+        const fileName = document.getElementById('fileName');
+        const fileSelected = document.getElementById('fileSelected');
+        const selectedFileName = document.getElementById('selectedFileName');
+        const selectedFileSize = document.getElementById('selectedFileSize');
+        const removeFile = document.getElementById('removeFile');
+        const validateBtn = document.getElementById('validateBtn');
+        const skipSmtp = document.getElementById('skipSmtp');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const results = document.getElementById('results');
+        const statsGrid = document.getElementById('statsGrid');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const errorDiv = document.getElementById('error');
+
+        let currentFile = null;
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            handleFileSelect(e.target.files[0]);
+        });
+
+        // Remove file
+        removeFile.addEventListener('click', () => {
+            clearFileSelection();
+        });
+
+        // Drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragging');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragging');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragging');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.csv')) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect(file);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (!file) return;
+            
+            currentFile = file;
+            selectedFileName.textContent = file.name;
+            selectedFileSize.textContent = formatFileSize(file.size);
+            fileSelected.classList.add('active');
+            fileName.textContent = 'File selected! Click validate when ready.';
+            validateBtn.disabled = false;
+        }
+
+        function clearFileSelection() {
+            currentFile = null;
+            fileInput.value = '';
+            fileSelected.classList.remove('active');
+            fileName.textContent = 'or drag and drop your file here';
+            validateBtn.disabled = true;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // Validate button click
+        validateBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
+
+            // Reset UI
+            errorDiv.classList.remove('active');
+            results.classList.remove('active');
+            progress.classList.add('active');
+            validateBtn.disabled = true;
+            
+            // Animate progress
+            progressBar.style.width = '0%';
+            setTimeout(() => progressBar.style.width = '30%', 100);
+            progressText.innerHTML = '<span class="progress-spinner"></span>Uploading and processing...';
+
+            const formData = new FormData();
+            formData.append('csv', currentFile);
+            formData.append('skipSmtp', skipSmtp.checked);
+
+            try {
+                const response = await fetch('/upload-csv', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Validation failed');
+                }
+
+                progressBar.style.width = '100%';
+                progressText.innerHTML = '<span class="progress-spinner"></span>Complete!';
+
+                const data = await response.json();
+                
+                // Show results
+                setTimeout(() => {
+                    progress.classList.remove('active');
+                    results.classList.add('active');
+                    displayStats(data.summary);
+                    setupDownload(data.csv);
+                    validateBtn.disabled = false;
+                }, 800);
+
+            } catch (error) {
+                progress.classList.remove('active');
+                errorDiv.textContent = `❌ Error: ${error.message}`;
+                errorDiv.classList.add('active');
+                validateBtn.disabled = false;
+            }
+        });
+
+        function displayStats(summary) {
+            const disposable = summary.disposable || 0;
+            const roleAccounts = summary.roleAccounts || 0;
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${summary.total}</div>
+                    <div class="stat-label">Total Emails</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value success">${summary.valid}</div>
+                    <div class="stat-label">Valid</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value error">${summary.invalid}</div>
+                    <div class="stat-label">Invalid</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value warning">${disposable}</div>
+                    <div class="stat-label">Disposable</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value accent">${roleAccounts}</div>
+                    <div class="stat-label">Role Accounts</div>
+                </div>
+            `;
+        }
+
+        function setupDownload(csvContent) {
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            downloadBtn.href = url;
+        }
+
+        // Copy code function for API examples
+        function copyCode(button, codeId) {
+            const code = document.getElementById(codeId).textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        // Make copyCode available globally
+        window.copyCode = copyCode;
+    </script>
+</body>
+</html>
