@@ -254,7 +254,7 @@ router.post('/validate-batch', async (req: Request, res: Response) => {
     const results = await validateEmailBatch(
       trimmedEmails,
       { skipSmtp: skipSmtp === true },
-      5 // Small concurrency to respect SMTP throttling
+      12 // Tuned concurrency to improve throughput without hurting quality
     );
     
     const duration = Date.now() - startTime;
@@ -409,7 +409,7 @@ router.post('/upload-csv', upload.single('csv'), async (req: Request, res: Respo
     
     // Validate emails
     const skipSmtp = req.body.skipSmtp === 'true';
-    const results = await validateEmailBatch(emails, { skipSmtp }, 5);
+    const results = await validateEmailBatch(emails, { skipSmtp }, 12);
     
     // Generate CSV output
     const csvLines = ['Email,Valid,Score,SMTP Status,Disposable,Role Account,Reason'];

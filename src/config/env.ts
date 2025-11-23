@@ -208,29 +208,29 @@ export const config: Config = {
   },
 
   smtp: {
-    maxGlobalConcurrency: getEnvInt('SMTP_MAX_GLOBAL_CONCURRENCY', 20, { min: 1, max: 100 }),
-    maxMxConcurrency: getEnvInt('SMTP_MAX_MX_CONCURRENCY', 2, { min: 1, max: 10 }),
-    perDomainMinIntervalMs: getEnvInt('SMTP_PER_DOMAIN_MIN_INTERVAL_MS', 2000, { min: 0 }),
-    softRetryLimit: getEnvInt('SMTP_SOFT_RETRY_LIMIT', 1, { min: 0, max: 5 }),
+    maxGlobalConcurrency: getEnvInt('SMTP_MAX_GLOBAL_CONCURRENCY', 12, { min: 1, max: 100 }),
+    maxMxConcurrency: getEnvInt('SMTP_MAX_MX_CONCURRENCY', 3, { min: 1, max: 10 }),
+    perDomainMinIntervalMs: getEnvInt('SMTP_PER_DOMAIN_MIN_INTERVAL_MS', 1500, { min: 0 }),
+    softRetryLimit: getEnvInt('SMTP_SOFT_RETRY_LIMIT', 0, { min: 0, max: 5 }),
     initialRetryDelayMs: getEnvInt('SMTP_INITIAL_RETRY_DELAY_MS', 2000, { min: 1000 }),
     retryBackoffFactor: getEnvFloat('SMTP_RETRY_BACKOFF_FACTOR', 2, { min: 1, max: 10 }),
-    connectTimeoutMs: getEnvInt('SMTP_CONNECT_TIMEOUT_MS', 8000, { min: 1000, max: 60000 }),
-    overallTimeoutMs: getEnvInt('SMTP_OVERALL_TIMEOUT_MS', 10000, { min: 5000, max: 120000 }),
+    connectTimeoutMs: getEnvInt('SMTP_CONNECT_TIMEOUT_MS', 5000, { min: 1000, max: 60000 }),
+    overallTimeoutMs: getEnvInt('SMTP_OVERALL_TIMEOUT_MS', 16000, { min: 5000, max: 120000 }),
     heloDomain: getEnvString('SMTP_HELO_DOMAIN', 'mail.localtest.candlebrain.app'),
     mailFrom: getEnvString('SMTP_MAIL_FROM', 'verifier@candlebrain.app'),
     
     // Per-phase timeouts for granular failure detection
-    bannerTimeoutMs: getEnvInt('SMTP_BANNER_TIMEOUT_MS', 2000, { min: 1000, max: 30000 }),
-    ehloTimeoutMs: getEnvInt('SMTP_EHLO_TIMEOUT_MS', 2000, { min: 1000, max: 30000 }),
-    mailTimeoutMs: getEnvInt('SMTP_MAIL_TIMEOUT_MS', 2000, { min: 1000, max: 30000 }),
-    rcptTimeoutMs: getEnvInt('SMTP_RCPT_TIMEOUT_MS', 3000, { min: 1000, max: 30000 }),
+    bannerTimeoutMs: getEnvInt('SMTP_BANNER_TIMEOUT_MS', 4000, { min: 1000, max: 30000 }),
+    ehloTimeoutMs: getEnvInt('SMTP_EHLO_TIMEOUT_MS', 4000, { min: 1000, max: 30000 }),
+    mailTimeoutMs: getEnvInt('SMTP_MAIL_TIMEOUT_MS', 4000, { min: 1000, max: 30000 }),
+    rcptTimeoutMs: getEnvInt('SMTP_RCPT_TIMEOUT_MS', 4000, { min: 1000, max: 30000 }),
     
     // STARTTLS support
     requireTls: getEnvString('SMTP_REQUIRE_TLS', 'false') === 'true',
     allowTlsDowngrade: getEnvString('SMTP_ALLOW_TLS_DOWNGRADE', 'true') === 'true',
     
     // MX probing strategy
-    maxMxAttempts: getEnvInt('SMTP_MAX_MX_ATTEMPTS', 2, { min: 1, max: 10 }),
+    maxMxAttempts: getEnvInt('SMTP_MAX_MX_ATTEMPTS', 3, { min: 1, max: 10 }),
     randomizeSamePriority: getEnvString('SMTP_RANDOMIZE_SAME_PRIORITY', 'true') === 'true',
   },
 };
