@@ -13,13 +13,30 @@ import { config } from '../config/env';
 import multer from 'multer';
 import { Readable } from 'stream';
 import csvParser from 'csv-parser';
+import * as XLSX from 'xlsx';
 
 const router = Router();
 
-// Configure multer for file uploads
+// Configure multer for file uploads (CSV and Excel)
 const upload = multer({ 
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (_req, file, cb) => {
+    // Accept CSV and Excel files
+    const allowedMimes = [
+      'text/csv',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+    const allowedExts = ['.csv', '.xls', '.xlsx'];
+    const ext = file.originalname.toLowerCase().slice(file.originalname.lastIndexOf('.'));
+    
+    if (allowedMimes.includes(file.mimetype) || allowedExts.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only CSV and Excel files (.csv, .xls, .xlsx) are allowed'));
+    }
+  }
 });
 
 /**
@@ -280,28 +297,50 @@ router.post('/validate-batch', async (req: Request, res: Response) => {
 });
 
 /**
- * Upload and validate CSV file
- * POST /upload-csv
- * 
- * Accepts CSV file with emails, validates them, and returns results as CSV
+ * Extract emails from uploaded file (CSV or Excel)
  */
-router.post('/upload-csv', upload.single('csv'), async (req: Request, res: Response) => {
-  const startTime = Date.now();
+async function extractEmailsFromFile(file: Express.Multer.File): Promise<string[]> {
+  const emails: string[] = [];
+  const ext = file.originalname.toLowerCase().slice(file.originalname.lastIndexOf('.'));
   
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        error: 'No file uploaded',
-        message: 'Please upload a CSV file',
-      });
+  if (ext === '.xlsx' || ext === '.xls') {
+    // Parse Excel file
+    const workbook = XLSX.read(file.buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+    
+    // Find email column (check first row for headers)
+    let emailColumnIndex = -1;
+    if (data.length > 0) {
+      const headers = data[0];
+      emailColumnIndex = headers.findIndex((h: any) => 
+        h && typeof h === 'string' && 
+        /email/i.test(h.toString().trim())
+      );
     }
     
-    logger.info(`POST /upload-csv - Processing file: ${req.file.originalname}`);
+    // If no email column found, use first column
+    if (emailColumnIndex === -1) {
+      emailColumnIndex = 0;
+    }
     
-    // Parse CSV from buffer
-    const emails: string[] = [];
-    const stream = Readable.from(req.file.buffer.toString());
+    // Extract emails (skip header row if found)
+    const startRow = data[0] && typeof data[0][emailColumnIndex] === 'string' && 
+                      /email/i.test(data[0][emailColumnIndex]) ? 1 : 0;
+    
+    for (let i = startRow; i < data.length; i++) {
+      const row = data[i];
+      if (row && row[emailColumnIndex]) {
+        const email = row[emailColumnIndex].toString().trim();
+        if (email && email.includes('@')) {
+          emails.push(email);
+        }
+      }
+    }
+  } else {
+    // Parse CSV file
+    const stream = Readable.from(file.buffer.toString());
     
     await new Promise<void>((resolve, reject) => {
       stream
@@ -319,12 +358,40 @@ router.post('/upload-csv', upload.single('csv'), async (req: Request, res: Respo
         .on('end', resolve)
         .on('error', reject);
     });
+  }
+  
+  return emails;
+}
+
+/**
+ * Upload and validate CSV or Excel file
+ * POST /upload-csv
+ * 
+ * Accepts CSV or Excel file with emails, validates them, and returns results
+ */
+router.post('/upload-csv', upload.single('csv'), async (req: Request, res: Response) => {
+  const startTime = Date.now();
+  
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'No file uploaded',
+        message: 'Please upload a CSV file',
+      });
+    }
+    
+    const fileType = req.file.originalname.toLowerCase().slice(req.file.originalname.lastIndexOf('.'));
+    logger.info(`POST /upload-csv - Processing ${fileType} file: ${req.file.originalname}`);
+    
+    // Extract emails from file (works for both CSV and Excel)
+    const emails = await extractEmailsFromFile(req.file);
     
     if (emails.length === 0) {
       return res.status(400).json({
         success: false,
         error: 'No emails found',
-        message: 'Could not find any emails in the CSV file. Make sure you have an "email" column.',
+        message: 'Could not find any emails in the file. Make sure you have an "email" column or emails in the first column.',
       });
     }
     
